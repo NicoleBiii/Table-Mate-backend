@@ -51,6 +51,8 @@ export const searchMenuItems = async (req, res) => {
           { "name.cn": { $regex: query, $options: "i" } },
           { "description.en": { $regex: query, $options: "i" } },
           { "description.cn": { $regex: query, $options: "i" } },
+          { "category.en": { $regex: query, $options: "i" } },
+          { "category.cn": { $regex: query, $options: "i" } }
         ],
       });
       res.status(200).json(menuItems);
@@ -61,14 +63,29 @@ export const searchMenuItems = async (req, res) => {
 
 // Create a new menu item (only admin)
 export const createMenuItem = async (req, res) => {
-    try {
-      const newMenuItem = new MenuItem(req.body);
+  try {
+      const { name, description, price, category } = req.body;
+      const image = req.body.image || "";
+
+      if (!name?.cn || !name?.en || !category?.cn || !category?.en) {
+          return res.status(400).json({ message: "Both English and Chinese names & categories are required" });
+      }
+
+      const newMenuItem = new MenuItem({
+          name,
+          description,
+          price,
+          category,
+          image
+      });
+
       await newMenuItem.save();
       res.status(201).json(newMenuItem);
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
-  };
+  }
+};
+
   
   // Update a menu item (only admin)
   export const updateMenuItem = async (req, res) => {
