@@ -15,3 +15,11 @@ export const verifyAuth = (req, res, next) => {
     res.status(401).json({ message: "Invalid or expired token." });
   }
 };  
+
+export const verifyAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    return next();
+  } else {
+    return res.status(403).json({ message: "Access denied, admin only" });
+  }
+};
