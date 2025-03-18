@@ -1,12 +1,12 @@
 import express from "express";
-import { verifyAuth } from "../middleware/auth";
+import { verifyAuth } from "../middleware/auth.js";
 import {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser
-} from "../controllers/userController";
+} from "../controllers/userController.js";
 
 const router = express.Router();
 

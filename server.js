@@ -2,10 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
-import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userRoutes";
-import menuRoutes from "./routes/menuRoutes";
-import orderRoutes from "./routes/orderRoutes";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import menuRoutes from "./routes/menuRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/menu", menuRoutes);
-app.use("/api/orders", orderRoutes); // ✅ Use order routes
+app.use("/api/orders", orderRoutes); 
 
 
 

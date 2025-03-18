@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyAuth } from "../middleware/auth"; // Ensure only authenticated users can access
+import { verifyAuth } from "../middleware/auth.js"; // Ensure only authenticated users can access
 import {
   createOrder,
   getAllOrders,
@@ -8,13 +8,14 @@ import {
   deleteOrder,
   updateOrderStatus,
   updatePaymentStatus
-} from "../controllers/orderController";
+} from "../controllers/orderController.js";
 
 const router = express.Router();
 
-router.post("/", verifyAuth, createOrder); // Create order
+router.post("/",createOrder); // Create order
+router.get("/:id", getOrderById); // Get order by ID
+
 router.get("/", verifyAuth, getAllOrders); // Get all orders
-router.get("/:id", verifyAuth, getOrderById); // Get order by ID
 router.put("/:id", verifyAuth, updateOrder); // Update order
 router.delete("/:id", verifyAuth, deleteOrder); // Delete order
 router.patch("/:id/status", verifyAuth, updateOrderStatus); // Update order status

@@ -4,62 +4,109 @@ import { verifyAuth } from "../middleware/auth.js";
 
 // Get all menu items
 export const getAllMenuItems = async (req, res) => {
-    try {
+  try {
+      const lang = req.query.lang || "en"; // Default to English
       const menuItems = await MenuItem.find();
-      res.status(200).json(menuItems);
-    } catch (error) {
+
+      const formattedItems = menuItems.map(item => ({
+          id: item._id,
+          name: item.name[lang] || item.name.en, // Default to English if the requested language is missing
+          description: item.description[lang] || item.description.en,
+          price: item.price,
+          category: item.category[lang] || item.category.en,
+          image: item.image,
+          available: item.available
+      }));
+
+      res.status(200).json(formattedItems);
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
-  };
+  }
+};
 
 // Get menu item by ID
 export const getMenuItemById = async (req, res) => {
-    try {
-      const menuItem = await MenuItem.findById(req.params.id);
+  try {
+      const { id } = req.params;
+      const lang = req.query.lang || "en";
+
+      const menuItem = await MenuItem.findById(id);
       if (!menuItem) {
-        return res.status(404).json({ message: "Menu item not found" });
+          return res.status(404).json({ message: "Menu item not found" });
       }
-      res.status(200).json(menuItem);
-    } catch (error) {
+
+      const formattedItem = {
+          id: menuItem._id,
+          name: menuItem.name[lang] || menuItem.name.en,
+          description: menuItem.description[lang] || menuItem.description.en,
+          price: menuItem.price,
+          category: menuItem.category[lang] || menuItem.category.en,
+          image: menuItem.image,
+          available: menuItem.available
+      };
+
+      res.status(200).json(formattedItem);
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
-  };
+  }
+};
 
 // Get menu items by category
 export const getMenuItemsByCategory = async (req, res) => {
-    try {
+  try {
       const { category } = req.params;
-      const menuItems = await MenuItem.find({ 
-        "category.en": { $regex: new RegExp(`^${category}$`, 'i') } // Case-insensitive match
-      });
+      const lang = req.query.lang || "en";
+
+      const menuItems = await MenuItem.find({ [`category.${lang}`]: { $regex: new RegExp(`^${category}$`, 'i') } });
+
       if (!menuItems || menuItems.length === 0) {
-        return res.status(404).json({ message: "No menu items found in this category" });
+          return res.status(404).json({ message: "No menu items found in this category" });
       }
-      res.status(200).json(menuItems);
-    } catch (error) {
+
+      const formattedItems = menuItems.map(item => ({
+          id: item._id,
+          name: item.name[lang] || item.name.en,
+          description: item.description[lang] || item.description.en,
+          price: item.price,
+          category: item.category[lang] || item.category.en,
+          image: item.image,
+          available: item.available
+      }));
+
+      res.status(200).json(formattedItems);
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
-  };
+  }
+};
 
 // Search menu items based on query
 export const searchMenuItems = async (req, res) => {
-    const { query } = req.query; // Extract the query parameter
-    try {
+  try {
+      const { query, lang = "en" } = req.query; // Extract query and language parameter
+
       const menuItems = await MenuItem.find({
-        $or: [
-          { "name.en": { $regex: query, $options: "i" } },
-          { "name.cn": { $regex: query, $options: "i" } },
-          { "description.en": { $regex: query, $options: "i" } },
-          { "description.cn": { $regex: query, $options: "i" } },
-          { "category.en": { $regex: query, $options: "i" } },
-          { "category.cn": { $regex: query, $options: "i" } }
-        ],
+          $or: [
+              { [`name.${lang}`]: { $regex: query, $options: "i" } },
+              { [`description.${lang}`]: { $regex: query, $options: "i" } },
+              { [`category.${lang}`]: { $regex: query, $options: "i" } }
+          ],
       });
-      res.status(200).json(menuItems);
-    } catch (error) {
+
+      const formattedItems = menuItems.map(item => ({
+          id: item._id,
+          name: item.name[lang] || item.name.en,
+          description: item.description[lang] || item.description.en,
+          price: item.price,
+          category: item.category[lang] || item.category.en,
+          image: item.image,
+          available: item.available
+      }));
+
+      res.status(200).json(formattedItems);
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
-  };
+  }
+};
 
 // Create a new menu item (only admin)
 export const createMenuItem = async (req, res) => {
