@@ -1,5 +1,5 @@
 import MenuItem from "../models/MenuItem.js";
-import { verifyAuth } from "../middleware/auth.js";
+import { verifyAuth } from "../middleware/auth.js"; //现在先不做登陆功能，忽略
 
 
 // Get all menu items
@@ -27,27 +27,27 @@ export const getAllMenuItems = async (req, res) => {
 // Get menu item by ID
 export const getMenuItemById = async (req, res) => {
   try {
-      const { id } = req.params;
-      const lang = req.query.lang || "en";
+    const { id } = req.params;
+    
+    const menuItem = await MenuItem.findById(id);
+    if (!menuItem) {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
 
-      const menuItem = await MenuItem.findById(id);
-      if (!menuItem) {
-          return res.status(404).json({ message: "Menu item not found" });
-      }
 
-      const formattedItem = {
-          id: menuItem._id,
-          name: menuItem.name[lang] || menuItem.name.en,
-          description: menuItem.description[lang] || menuItem.description.en,
-          price: menuItem.price,
-          category: menuItem.category[lang] || menuItem.category.en,
-          image: menuItem.image,
-          available: menuItem.available
-      };
+    const formattedItem = {
+      id: menuItem._id,
+      name: menuItem.name,
+      description: menuItem.description || { cn: '', en: '' },
+      category: menuItem.category,
+      price: menuItem.price,
+      image: menuItem.image,
+      available: menuItem.available
+    };
 
-      res.status(200).json(formattedItem);
+    res.status(200).json(formattedItem);
   } catch (error) {
-      res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -25,16 +25,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-//  Get all orders
-export const getAllOrders = async (req, res) => {
-  try {
-    const orders = await Order.find().populate("items.menuItem"); // Populate menuItem details
-    res.status(200).json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 //  Get a single order by ID
 export const getOrderById = async (req, res) => {
   try {
@@ -47,6 +37,33 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get order by status by date
+export const getOrders = async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    let query = {};
+    if (date) {
+      const startDate = new Date(`${date}T00:00:00.000Z`);
+      const endDate = new Date(`${date}T23:59:59.999Z`);
+      query.createdAt = { $gte: startDate, $lte: endDate };
+    }
+
+    const orders = await Order.find(query)
+      .populate({
+        path: 'items.menuItem',
+        select: 'name description price category',
+        model: 'MenuItem' 
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 //  Update an order (modify items, table number, etc.)
 export const updateOrder = async (req, res) => {
@@ -61,7 +78,7 @@ export const updateOrder = async (req, res) => {
       }
       totalPrice += menuItem.price * item.quantity;
     }
-
+    console.log("Updating order with ID:", req.params.id);
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { tableNumber, items, totalPrice },

@@ -14,9 +14,21 @@ export const login = async (req, res) => {
         if(!isMatch) {
             return res.status(400).json({message:"Invalid credentials"});
         }
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined in environment variables");
+          }
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        res.status(200).json({token});
+        const userData = {
+            id: user._id,
+            username: user.username,
+          };
+          res.json({ token, user: userData });
     } catch(e) {
-        res.status(500).json({ message: "Internal Server Error" });
+        console.log("Login error:",e);
+        res.status(500).json({
+            message: "Authentication failed",
+            error: e.message
+          });
     }
 }
