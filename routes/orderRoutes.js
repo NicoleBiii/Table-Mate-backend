@@ -7,12 +7,14 @@ import {
   updateOrder,
   deleteOrder,
   updateOrderStatus,
-  updatePaymentStatus
+  updatePaymentStatus,
+  getOrderByTableNumber
 } from "../controllers/orderController.js";
 
 const router = express.Router();
 
 router.post("/",createOrder); // Create order
+router.get('/table/:tableNumber', getOrderByTableNumber); // get order by table number
 router.get("/:id", getOrderById); // Get order by ID
 router.put("/:id", updateOrder); // Update order
 

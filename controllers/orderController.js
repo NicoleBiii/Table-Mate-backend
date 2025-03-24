@@ -28,7 +28,10 @@ export const createOrder = async (req, res) => {
 //  Get a single order by ID
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate("items.menuItem");
+    const order = await Order.findById(req.params.id)
+    .populate('items.menuItem')
+    .exec();
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -36,6 +39,28 @@ export const getOrderById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+// get order by table number
+export const getOrderByTableNumber = async (req, res) => {
+  try {
+    const tableNumber = req.params.tableNumber;
+    if (!tableNumber) {
+        return res.status(400).json({ message: "Table number is required" });
+    }
+
+    const order = await Order.findOne({ tableNumber })
+    .populate('items.menuItem') 
+    .exec();
+    if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json(order);
+} catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+}
 };
 
 // Get order by status by date
