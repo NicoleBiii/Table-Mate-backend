@@ -49,18 +49,23 @@ export const getOrderByTableNumber = async (req, res) => {
         return res.status(400).json({ message: "Table number is required" });
     }
 
-    const order = await Order.findOne({ tableNumber })
+    // Fetch the first order with the given tableNumber and paymentStatus 'unpaid'
+    const order = await Order.findOne({ 
+      tableNumber, 
+      paymentStatus: 'unpaid' 
+    })
     .populate('items.menuItem') 
     .exec();
+
     if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        return res.status(404).json({ message: "Unpaid order not found" });
     }
 
     res.json(order);
-} catch (error) {
+  } catch (error) {
     console.error("Error fetching order:", error);
     res.status(500).json({ message: "Server error", error: error.message });
-}
+  }
 };
 
 // Get order by status by date
